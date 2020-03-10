@@ -1,23 +1,32 @@
+import java.io.EOFException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Index {
+class Index {
     public static String [] DivideInputFileIntoRuns(String Inputfilename, int runSize) throws IOException {
-        String [] files = new String[runSize];
+        String [] files = new String[20];
         RandomAccessFile IndexFile = new RandomAccessFile(Inputfilename, "rw");
-        long size = IndexFile.length()/runSize;
-        for(int i=0; i<runSize; i++) {
-            String FileName = "file" + (i + 1);
-            RandomAccessFile file = new RandomAccessFile(FileName + ".bin", "rw");
-            files[i] = FileName+".bin";
-            for(int j=0; j<size/4; j++)
-                file.writeInt(IndexFile.readInt());
-
+        int i=0;
+        while (true) {
+            try {
+                String FileName = "file" + (i + 1);
+                RandomAccessFile file = new RandomAccessFile(FileName + ".bin", "rw");
+                files[i] = FileName+".bin";
+                i++;
+                for(int j=0; j<runSize; j++) {
+                    file.writeInt(IndexFile.readInt());
+                    file.writeInt(IndexFile.readInt());
+                }
+            } catch (EOFException ex) {
+                break;
+            }
         }
-System.out.println(size);
+        RandomAccessFile file = new RandomAccessFile("file3.bin","rw");
+        file.seek(file.length()-8);
+        System.out.println(file.readInt());
         return files;
     }
 
@@ -66,7 +75,7 @@ System.out.println(size);
         //Scanner in =new Scanner(System.in);
         //System.out.println("Please enter the input");
         //String stream=in.next();
-        DivideInputFileIntoRuns("index.bin" , 3);
+        DivideInputFileIntoRuns("index.bin" , 25);
         //SortEachRunOnMemoryAndWriteItBack(DivideInputFileIntoRuns("index.bin" , 3));
 
 
